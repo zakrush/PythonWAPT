@@ -13,7 +13,7 @@ class MySpider(BaseSpider):
         hxs = Selector(response)
 
         # CODE for scraping book titles
-        book_titles = hxs.xpath('//div[@class="book-block-title"]/text()').extract()
+        book_titles = hxs.xpath('//div[@class="bs_item col-md-2"]/h3/text()').extract()
         for title in book_titles:
             book = BasicCrawlerItem()
             book["title"] = title
