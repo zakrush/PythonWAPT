@@ -12,7 +12,32 @@ class My2Spider(BaseSpider):
     def parse(self, response):
         hxs = Selector(response)
 
+        #CODE for scrapping_emails
+        emails = hxs.xpath("//*[contains(text(),'@')]").extract()
+        for email in emails:
+            mail = BasicCrawler2Item()
+            mail['email'] = email
+            mail['location_url'] = response.url
+            yield mail
 
+        #CODE for FORMS
+        forms = hxs.xpath("//form/@action").extract()
+        for form in forms:
+            formy = BasicCrawler2Item()
+            formy['forme'] = form
+            formy['location_url'] = response.url
+            yield formy
+
+        #CODE for comments
+        comments = hxs.xpath('//comment()').extract()
+
+        for comment in comments:
+            comm = BasicCrawler2Item()
+            comm['comment'] = comment
+            comm['location_url'] = response.url
+            yield comm
+
+        #for recursive links
         visited_links = list()
         links = hxs.xpath('//a/@href').extract()
         link_validator= re.compile(
