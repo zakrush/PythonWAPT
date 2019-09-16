@@ -9,7 +9,7 @@ def banner():
     print("********************")
 
 def usage():
-    print "Usage:"
+    print("Usage:")
     print("         -w: url (http://somesite.com/FUZZ")
     print("         -t: threads")
     print("          -f: dictionary file \n")
@@ -22,15 +22,15 @@ class request_performer(Thread):
             self.word = word.split("\n")[0]
             self.urly = url.replace('FUZZ',self.word)
             self.url = self.urly
-        except Exception, e:
-            print e
+        except Exception as e:
+            print(e)
 
     def run(self):
         try:
             r = requests.get(self.url)
             print(self.url + "-" + str(r.status_code))
             i[0] = i[0]-1 #удаляем одну нить из счетчика
-        except Exception, e:
+        except Exception as e:
             print(e)
 
 def start(argv):
@@ -44,13 +44,13 @@ def start(argv):
         print ("Error en arguments")
         sys.exit()
 
-    for opt,arg in opts :
-        if opt = '-w' :
+    for opt,arg in opts:
+        if opt == '-w' :
             url = arg
-        elif opt = '-f':
+        elif opt == '-f':
             dict = arg
-        elif opt = '-t':
-            threads = arg
+        elif opt == '-t':
+            threads = int(arg)
 
     try:
         f = open(dict,"r")
@@ -69,7 +69,7 @@ def launcher_thread(names,th,url):
 
     while len(names):
         try:
-            if i[0]<th:
+            if i[0] < th:
                 n = names.pop(0)
                 i[0] = i[0] + 1
                 thread = request_performer(n,url)
