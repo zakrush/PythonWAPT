@@ -1,7 +1,7 @@
 import requests
 
 myheaders = {'User-agent':'Iphone 6'}
-r = requests.get('http://httpbin.org/ip', headers=myheaders) #, data={'name':'packt'})
+r = requests.get('https://timebook.ru', headers=myheaders) #, data={'name':'packt'})
 print(r.url)
 print('Status code:')
 print('\t [-]' + str(r.status_code) + '\n')
@@ -13,4 +13,4 @@ for x in r.headers:
 print('****************************************\n')
 
 print("Content:\n")
-print(r.text)
+print(r.content.decode(encoding='utf-8'))
