@@ -2,6 +2,8 @@ import requests
 from threading import Thread
 import sys
 import getopt
+import re
+from termcolor import colored
 
 def banner():
     print("\n********************")
