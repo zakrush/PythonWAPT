@@ -7,6 +7,11 @@ from termcolor import colored
 import hashlib
 import time
 
+from selenium import webdriver
+from selenium.webdriver.common.keys import Keys
+from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
+
+
 
 def banner():
     print("\n********************")
@@ -53,6 +58,15 @@ class request_performer(Thread):
 
             if self.hidecode != code:
                 if '200' <= code < '300':
+
+                    dcap = dict(DesiredCapabilities.PHANTOMJS)
+                    driver = webdriver.PhantomJS(desired_capabilities=dcap)
+                    time.sleep(2)
+
+                    driver.set_window_size(1024,768)
+                    driver.get(self.url)
+                    driver.save_screenshot(self.word+".png")
+
                     print(totaltime + "\t\t" + colored(code, "green") + "\t" + chars +
                           "\t" + words + "\t " + lines + "\t" + hash[:-7:-1] + "\t" + self.url + "\t\t  ")
                 elif '400' <= code < '500':
