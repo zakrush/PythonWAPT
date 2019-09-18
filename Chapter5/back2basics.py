@@ -31,7 +31,7 @@ class request_performer(Thread):
             self.password = passwd.split("\n")[0]
             self.url = url
             self.username = user
-            print("-" + self.password + "-")
+            print("- " + self.password + " -")
 
         except Exception as e:
             print(e)
@@ -45,13 +45,11 @@ class request_performer(Thread):
                 if r.status_code == 200:
                     hit = "0"
                     print("[++++] Password FOUND for user:  "+ colored(self.username, "green") + " password is "
-                          + colored(self.password, 'green') + "- !!!!")
+                          + colored(self.password, 'green') + " - !!!!")
                     sys.exit()
                 else:
                     print("Not valid " + self.password)
-
-            #            print(self.url + "-" + str(r.status_code))
-                i[0] = i[0] - 1  # удаляем одну нить из счетчика
+                    i[0] = i[0] - 1  # удаляем одну нить из счетчика
             except Exception as e:
                 print(e)
 
@@ -111,6 +109,9 @@ def launcher_thread(passwd, th, url, username):
 
 if __name__ == "__main__":
     try:
-        start(sys.argv[1:])
+        if hit == "1":
+            start(sys.argv[1:])
+        else:
+            sys.exit()
     except KeyboardInterrupt:
         print("Back interrupted by user, killing all threads..!!")
