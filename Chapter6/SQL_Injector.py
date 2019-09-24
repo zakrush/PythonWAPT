@@ -38,7 +38,7 @@ def start(argv):
 
     try:
        f = open(dictio, "r")
-       injects = f.readlines()
+       injects = f.read().splitlines()
     except:
         print("Failed opening file: " + dictio)
         sys.exit()
@@ -55,7 +55,7 @@ def launcher(url, diction):
     print("-------------------")
 
     for x in res:
-        print(x.split(';'))
+        print(x.split(';')[0])
 
 
 def injector(injected):
@@ -67,8 +67,15 @@ def injector(injected):
         req = requests.get(y)
 
         for x in errors:
-            if req.content.find(x) != -1:
+            if req.text.find(x) != -1:
                 res = y + ';' + x
                 results.append(res)
     return results
+
+if __name__ == "__main__":
+    try:
+        start(sys.argv[1:])
+
+    except KeyboardInterrupt:
+        print("Back interrupted by user, killing all threads..!!")
 
