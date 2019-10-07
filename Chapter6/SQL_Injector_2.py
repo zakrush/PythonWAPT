@@ -61,11 +61,11 @@ def launcher(url, diction):
         print(x.split(';')[0])
 
     nums_of_col = detect_columns(url)
-    print('\nNumber of columns:' + nums_of_col + '\n')
-    print('---------------------------------')
-    print('Column names')
-    print('---------------------------------')
-    [print(name) for name in detect_columns_names(url)]
+    print('\nNumber of columns:' + colored(str(nums_of_col), 'green') + '\n')
+    print(colored('---------------------------------', 'blue'))
+    print(colored('Column names', 'blue'))
+    print(colored('---------------------------------', 'blue'))
+    [print(colored(name,'green')) for name in detect_columns_names(url)]
 
     username = detect_user(url)
     print('\nUsername is:\n' + username)
