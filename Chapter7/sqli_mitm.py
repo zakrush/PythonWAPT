@@ -20,8 +20,8 @@ def injector(url):
             req = requests.get(url_to_test.replace('FUZZ',inj))
             for err in errors:
                 if req.text.find(err) != -1:
-                    result = req.url + ';' + err
-                    f.write(result)
+                    result = req.url + ';' + err + '; INJECT IS ' + inj
+                    f.write(result + '\n')
     f.close()
 
 def request(flow):
